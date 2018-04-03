@@ -96,10 +96,13 @@ for line in lines:
 
 
 test = []
-for x in range(0, 20):
-	test.append(random.randint(1, 100))
-print(test)
-print("1", dselect(test, 1) == rselect(test, 1) == sorted(test)[0])
-print("10", dselect(test, 10) == rselect(test, 10) == sorted(test)[9])
-print("11", dselect(test, 11) == rselect(test, 11) == sorted(test)[10])
-print("20", dselect(test, 20) == rselect(test, 20) == sorted(test)[19])
+for x in range(0, 2000):
+   test.append(random.randint(1,2000))
+
+flag = False
+for i in range(200):
+    a = random.randint(1, 2000)
+    flag =  rselect(test, 1) == dselect(test, 1) == sorted(test)[0] and rselect(test, 100) == dselect(test, 100) == sorted(test)[99] and rselect(test, a) == dselect(test, a) == sorted(test)[a-1] and rselect(test, 200) == dselect(test, 200) == sorted(test)[199]
+
+    if(flag == False):
+        print("이창영 바보 멍청이")
