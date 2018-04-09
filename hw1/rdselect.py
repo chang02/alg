@@ -1,108 +1,114 @@
 import sys
 import random
+import time
 
-def partition(input, p, r, i):
-	input[0], input[i] = input[i], input[0]
+def partition(arr, p, r, i):
+	arr[0], arr[i] = arr[i], arr[0]
 
 	j = p+1
 	for x in range(p+1, r+1):
-		if input[p] < input[x]:
+		if arr[p] < arr[x]:
 			pass
 		else:
-			input[j], input[x] = input[x], input[j]
+			arr[j], arr[x] = arr[x], arr[j]
 			j = j + 1
 
-	input[j-1], input[p] = input[p], input[j-1]
+	arr[j-1], arr[p] = arr[p], arr[j-1]
 
 	return j-1
 
-def insertionSort(input):
-    for x in range(1, len(input)):
-        val = input[x]
+def insertionSort(a):
+    for x in range(1, len(a)):
+        val = a[x]
         i = x
-        while i > 0 and input[i-1] > val:
-            input[i] = input[i-1]
+        while i > 0 and a[i-1] > val:
+            a[i] = a[i-1]
             i -= 1
-        input[i] = val
+        a[i] = val
 
 def median_of_five(five):
 	insertionSort(five)
 	return five[len(five)//2]
 
-def find_median(input):
+def find_median(arr):
 	i = 0
-	divided_input = []
-	temp_input = []
+	divided_arr = []
+	temp_arr = []
 	#combine with 5 elements
-	for x in range(0,len(input)):
+	for x in range(0,len(arr)):
 		if x % 5 == 0 and x != 0:
-			divided_input.append(temp_input)
-			temp_input = []
-		temp_input.append(input[x])
-		if x == len(input) - 1:
-			divided_input.append(temp_input)
+			divided_arr.append(temp_arr)
+			temp_arr = []
+		temp_arr.append(arr[x])
+		if x == len(arr) - 1:
+			divided_arr.append(temp_arr)
 	
-	if len(divided_input) == 1:
-		return median_of_five(divided_input[0])
+	if len(divided_arr) == 1:
+		return median_of_five(divided_arr[0])
 
 	#new list of medians
 	medians = []
-	for division in divided_input:
+	for division in divided_arr:
 		medians.append(median_of_five(division))
 
 	return find_median(medians)
 
-def rselect(input, i):
-	ran = random.randrange(0, len(input))
+def rselect(arr, i):
+	ran = random.randrange(0, len(arr))
 
-	q = partition(input, 0, len(input)-1, ran)
+	q = partition(arr, 0, len(arr)-1, ran)
 	if q == i-1:
-		return input[q]
+		return arr[q]
 	elif q > i-1:
-		new_input = list(input[0:q])
+		new_input = list(arr[0:q])
 		return rselect(new_input, i)
 	else:
-		new_input = list(input[q+1:])
+		new_input = list(arr[q+1:])
 		return rselect(new_input, i-q-1)
 
-def dselect(input, i):
-	median = find_median(input)
-	index = input.index(median)
+def dselect(arr, i):
+	median = find_median(arr)
+	index = arr.index(median)
 
-	q = partition(input, 0, len(input)-1, index)
+	q = partition(arr, 0, len(arr)-1, index)
 	if q == i-1:
-		return input[q]
+		return arr[q]
 	elif q > i-1:
-		new_input = list(input[0:q])
+		new_input = list(arr[0:q])
 		return dselect(new_input, i)
 	else:
-		new_input = list(input[q+1:])
+		new_input = list(arr[q+1:])
 		return dselect(new_input, i-q-1)
 
 #get input start
-index = int(sys.argv[1])
+nth = int(sys.argv[1])
 filename = sys.argv[2]
 
 f = open(filename, 'r')
 lines = f.readlines()
 
-input = []
+arr = []
 
 for line in lines:
 	line_arr = line.split(" ")
 	for number in line_arr:
-		input.append(int(number))
+		if number != '':
+			arr.append(int(number))
 #get input complete
 
+arr1 = list(arr)
+arr2 = list(arr)
 
-test = []
-for x in range(0, 2000):
-   test.append(random.randint(1,2000))
+rselect_start = time.time()
+rresult = rselect(arr1, nth)
+rselect_end = time.time()
+print("[Randomized select result]")
+print(nth, "smallest element :", rresult)
+print("program running time : %s" %round((rselect_end - rselect_start), 2)+"s")
 
-flag = False
-for i in range(200):
-    a = random.randint(1, 2000)
-    flag =  rselect(test, 1) == dselect(test, 1) == sorted(test)[0] and rselect(test, 100) == dselect(test, 100) == sorted(test)[99] and rselect(test, a) == dselect(test, a) == sorted(test)[a-1] and rselect(test, 200) == dselect(test, 200) == sorted(test)[199]
-
-    if(flag == False):
-        print("이창영 바보 멍청이")
+dselect_start = time.time()
+dresult = dselect(arr2, nth)
+dselect_end = time.time()
+print("[Deterministic select result]")
+print(nth, "smallest element :", dresult)
+print("program running time : %s" %round((dselect_end - dselect_start), 2)+"s")
