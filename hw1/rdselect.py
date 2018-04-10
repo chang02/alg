@@ -92,7 +92,7 @@ arr = []
 for line in lines:
 	line_arr = line.split(" ")
 	for number in line_arr:
-		if number != '':
+		if number != '' and number != '\n':
 			arr.append(int(number))
 #get input complete
 
