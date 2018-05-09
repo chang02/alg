@@ -87,6 +87,37 @@ def insert_case3(n):
 	u = n.getUncle()
 
 	if u != None and u.color == RED:
+		n.parent.setColor(BLACK)
+		u.setColor(BLACK)
+		g = getGrandparent(n)
+		g.setColor(RED)
+		insert_case1(g)
+	else:
+		insert_case4(n)
+
+def insert_case4(n):
+	g = n.getGrandparent()
+	if n == n.parent.right and n.parent == g.left:
+		rotate_left(n.parent)
+		n = n.left
+	elif n == n.parent.left and n.parent == g.right:
+		rotate_right(n.parent)
+		n = n.right
+	insert_case5(n)
+
+def insert_case5(n):
+	g = n.getGrandparent()
+	n.parent.setColor(BLACK)
+	g.setColor(RED)
+	if n == n.parent.left:
+		rotate_right(g)
+	else:
+		rotate_left(g)
+
+def rotate_left(n):
+	c = n.right
+	p = n.parent
+	
 		
 
 head = Node(None)
