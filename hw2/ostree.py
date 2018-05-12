@@ -1,5 +1,6 @@
 BLACK = 0
 RED = 1
+import sys
 
 class Node:
 	color = None
@@ -316,13 +317,14 @@ class ostree:
 
 		if curr == leafNode:
 			return 0
-		else:
-			if curr == self.head:
-				return curr.left.size + 1
-			elif curr.parent.right == curr:
-				return curr.parent.left.size + curr.left.size + 1
-			elif curr.parent.left == curr:
-				return curr.left.size + 1
+			
+		r = curr.left.size + 1
+		y = curr
+		while y != self.head:
+			if y == y.parent.right:
+				r = r + y.parent.left.size + 1
+			y = y.parent
+		return r
 
 	def print_tree(self, node, blank):
 		if not(node == leafNode or node == None):
@@ -331,18 +333,26 @@ class ostree:
 			self.print_tree(node.right, blank + " ")
 
 t = ostree()
-while True:
-	i = input()
-	i_arr = i.split(' ')
+filename = sys.argv[1]
+
+f = open(filename, 'r')
+f2 = open("out.txt", 'w')
+lines = f.readlines()
+
+for line in lines:
+	i_arr = line.split(' ')
 	command = i_arr[0]
 	number = int(i_arr[1])
 	if command == 'I':
-		print(t.insert(number))
+		f2.write(str(t.insert(number)) + '\n')
 	elif command == 'D':
-		print(t.delete(number))
+		f2.write(str(t.delete(number)) + '\n')
 	elif command == 'S':
-		print(t.select(t.head, number))
+		f2.write(str(t.select(t.head, number)) + '\n')
 	elif command == 'R':
-		print(t.rank(number))
+		f2.write(str(t.rank(number)) + '\n')
 	elif command == 'P':
 		t.print_tree(t.head, '')
+
+f.close()
+f2.close()
