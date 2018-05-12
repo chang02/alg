@@ -56,10 +56,13 @@ class ostree:
 		if self.head == None:
 			self.head = newNode
 			self.insert_case1(self.head)
+			return x
 		else:
 			curr = self.head
 			while True:
-				if x < curr.data:
+				if x == curr.data:
+					return 0
+				elif x < curr.data:
 					if curr.left != leafNode:
 						curr.setSize(curr.size+1)
 						curr = curr.left
@@ -68,7 +71,7 @@ class ostree:
 						newNode.setParent(curr)
 						curr.setLeft(newNode)
 						self.insert_case1(newNode)
-						break
+						return x
 				else:
 					if curr.right != leafNode:
 						curr.setSize(curr.size+1)
@@ -78,7 +81,7 @@ class ostree:
 						newNode.setParent(curr)
 						curr.setRight(newNode)
 						self.insert_case1(newNode)
-						break
+						return x
 
 	def insert_case1(self, n):
 		if n.parent == None:
@@ -174,6 +177,11 @@ class ostree:
 		curr = self.head
 		targetNode = None
 		leastNode = None
+		if self.head == None:
+			return 0
+		if self.head.data == x and self.head.left == leafNode and self.head.right == leafNode:
+			self.head = None
+			return x
 		while curr != leafNode:
 			if curr.data == x:
 				targetNode = curr
@@ -184,7 +192,7 @@ class ostree:
 				curr = curr.left
 
 		if curr == leafNode:
-			return
+			return 0
 
 		if targetNode.right == leafNode:
 			leastNode = targetNode
@@ -205,6 +213,7 @@ class ostree:
 		leastNode.setData(tempdata)
 
 		self.delete_one_child(leastNode)
+		return x
 
 	def delete_one_child(self, n):
 		child = None
@@ -214,7 +223,10 @@ class ostree:
 		else:
 			child = n.right
 
-		if n == p.left:
+		if p == None:
+			child.setParent(None)
+			self.head = child
+		elif n == p.left:
 			p.setLeft(child)
 			child.setParent(p)
 		elif n == p.right:
@@ -277,19 +289,60 @@ class ostree:
 			s.left.setColor(BLACK)
 			self.rotate_right(n.parent)
 
+	def select(self, x, i):
+		r = x.left.size + 1
+		if i == r:
+			return x.data
+		elif i < r:
+			if x.left == leafNode:
+				return 0
+			else:
+				return self.select(x.left, i)
+		else:
+			if x.right == leafNode:
+				return 0
+			else:
+				return self.select(x.right, i-r)
+
+	def rank(self, x):
+		curr = self.head
+		while curr != leafNode:
+			if curr.data == x:
+				break
+			elif curr.data < x:
+				curr = curr.right
+			else:
+				curr = curr.left
+
+		if curr == leafNode:
+			return 0
+		else:
+			if curr == self.head:
+				return curr.left.size + 1
+			elif curr.parent.right == curr:
+				return curr.parent.left.size + curr.left.size + 1
+			elif curr.parent.left == curr:
+				return curr.left.size + 1
+
 	def print_tree(self, node, blank):
-	    if not(node == leafNode):
-	        print(blank + str(node.data))
-	        self.print_tree(node.left, blank + " ")
-	        self.print_tree(node.right, blank + " ")
+		if not(node == leafNode or node == None):
+			print(blank + str(node.data))
+			self.print_tree(node.left, blank + " ")
+			self.print_tree(node.right, blank + " ")
 
 t = ostree()
-t.insert(7)
-t.insert(6)
-t.insert(5)
-t.insert(4)
-t.insert(3)
-t.insert(2)
-t.insert(1)
-
-t.print_tree(t.head, "")
+while True:
+	i = input()
+	i_arr = i.split(' ')
+	command = i_arr[0]
+	number = int(i_arr[1])
+	if command == 'I':
+		print(t.insert(number))
+	elif command == 'D':
+		print(t.delete(number))
+	elif command == 'S':
+		print(t.select(t.head, number))
+	elif command == 'R':
+		print(t.rank(number))
+	elif command == 'P':
+		t.print_tree(t.head, '')
