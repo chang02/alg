@@ -10,7 +10,7 @@ out_lines = out_f.readlines()
 
 arr = []
 result_arr = []
-for x in range(0, 1000):
+for x in range(0, 999):
 	arr.append(0)
 
 for in_line in in_lines:
