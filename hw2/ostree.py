@@ -43,17 +43,25 @@ class Node:
 		else:
 			return self.parent.left
 
-leafNode = Node(None)
-leafNode.setColor(BLACK)
-leafNode.setSize(0)
 class ostree:
 	head = None
 	def insert(self, x):
+		newLeaf1 = Node(None)
+		newLeaf1.setColor(BLACK)
+		newLeaf1.setSize(0)
+		newLeaf2 = Node(None)
+		newLeaf2.setColor(BLACK)
+		newLeaf2.setSize(0)
+		
+
 		newNode = Node(x)
 		newNode.setSize(1)
-		newNode.setLeft(leafNode)
-		newNode.setRight(leafNode)
+		newNode.setLeft(newLeaf1)
+		newNode.setRight(newLeaf2)
+		newLeaf1.setParent(newNode)
+		newLeaf2.setParent(newNode)
 		newNode.setColor(RED)
+
 		if self.head == None:
 			self.head = newNode
 			self.insert_case1(self.head)
@@ -62,9 +70,17 @@ class ostree:
 			curr = self.head
 			while True:
 				if x == curr.data:
-					return 0
+					if curr == self.head:
+						return 0
+					else:
+						curr = curr.parent
+						while curr != self.head:
+							curr.setSize(curr.size - 1)
+							curr = curr.parent
+						self.head.setSize(self.head.size - 1)
+						return 0
 				elif x < curr.data:
-					if curr.left != leafNode:
+					if curr.left.data != None:
 						curr.setSize(curr.size+1)
 						curr = curr.left
 					else:
@@ -74,7 +90,7 @@ class ostree:
 						self.insert_case1(newNode)
 						return x
 				else:
-					if curr.right != leafNode:
+					if curr.right.data != None:
 						curr.setSize(curr.size+1)
 						curr = curr.right
 					else:
@@ -99,7 +115,7 @@ class ostree:
 	def insert_case3(self, n):
 		u = n.getUncle()
 
-		if u != leafNode and u.color == RED:
+		if u.data != None and u.color == RED:
 			n.parent.setColor(BLACK)
 			u.setColor(BLACK)
 			g = n.getGrandparent()
@@ -134,7 +150,7 @@ class ostree:
 		c.setSize(n.size)
 		n.setSize(c.left.size + n.left.size + 1)
 
-		if c.left != leafNode:
+		if c.left.data != None:
 			c.left.setParent(n)
 
 		n.setRight(c.left)
@@ -158,7 +174,7 @@ class ostree:
 		c.setSize(n.size)
 		n.setSize(c.right.size + n.right.size + 1)
 
-		if c.right != leafNode:
+		if c.right.data != None:
 			c.right.setParent(n)
 
 		n.setLeft(c.right)
@@ -180,10 +196,10 @@ class ostree:
 		leastNode = None
 		if self.head == None:
 			return 0
-		if self.head.data == x and self.head.left == leafNode and self.head.right == leafNode:
+		if self.head.data == x and self.head.left.data == None and self.head.right.data == None:
 			self.head = None
 			return x
-		while curr != leafNode:
+		while curr.data != None:
 			if curr.data == x:
 				targetNode = curr
 				break
@@ -192,14 +208,14 @@ class ostree:
 			elif curr.data > x:
 				curr = curr.left
 
-		if curr == leafNode:
+		if curr.data == None:
 			return 0
 
-		if targetNode.right == leafNode:
+		if targetNode.right.data == None:
 			leastNode = targetNode
 		else:
 			curr = targetNode.right
-			while curr.left != leafNode:
+			while curr.left.data != None:
 				curr = curr.left
 			leastNode = curr
 
@@ -219,7 +235,7 @@ class ostree:
 	def delete_one_child(self, n):
 		child = None
 		p = n.parent
-		if n.right == leafNode:
+		if n.right.data == None:
 			child = n.left
 		else:
 			child = n.right
@@ -291,23 +307,28 @@ class ostree:
 			self.rotate_right(n.parent)
 
 	def select(self, x, i):
+		if self.head == None:
+			return 0
 		r = x.left.size + 1
 		if i == r:
 			return x.data
 		elif i < r:
-			if x.left == leafNode:
+			if x.left.data == None:
 				return 0
 			else:
 				return self.select(x.left, i)
 		else:
-			if x.right == leafNode:
+			if x.right.data == None:
 				return 0
 			else:
 				return self.select(x.right, i-r)
 
 	def rank(self, x):
+		if self.head == None:
+			return 0
+
 		curr = self.head
-		while curr != leafNode:
+		while curr.data != None:
 			if curr.data == x:
 				break
 			elif curr.data < x:
@@ -315,7 +336,7 @@ class ostree:
 			else:
 				curr = curr.left
 
-		if curr == leafNode:
+		if curr.data == None:
 			return 0
 			
 		r = curr.left.size + 1
@@ -327,7 +348,7 @@ class ostree:
 		return r
 
 	def print_tree(self, node, blank):
-		if not(node == leafNode or node == None):
+		if not(node.data == None or node == None):
 			print(blank + str(node.data))
 			self.print_tree(node.left, blank + " ")
 			self.print_tree(node.right, blank + " ")
@@ -338,6 +359,11 @@ filename = sys.argv[1]
 f = open(filename, 'r')
 f2 = open("out.txt", 'w')
 lines = f.readlines()
+
+for line in lines:
+	f2.write(line)
+
+f2.write('\n')
 
 for line in lines:
 	i_arr = line.split(' ')
