@@ -13,7 +13,14 @@ public class SCC {
 		for(int i=0;i<number;i++) {
 			g.add(reader.readLine());
 		}
-		
-		
+//		adjmatrix m = new adjmatrix(g);
+//		m.getSCC();
+		adjlist l = new adjlist(g);
+		for(int i=0;i<l.l.length;i++) {
+			for(int j=0;j<l.l[i].size();j++) {
+				System.out.print(l.l[i].get(j) + " ");
+			}
+			System.out.println("");
+		}
 	}
 }
