@@ -1,29 +1,35 @@
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Stack;
-public class adjlist {
-	LinkedList<Integer>[] l;
-	LinkedList<Integer>[] inversedl;
-	public adjlist(ArrayList<String> g) {
-		l = new LinkedList[g.size()];
-		inversedl = new LinkedList[g.size()];
-		for(int i=0;i<g.size();i++) {
-			l[i] = new LinkedList<Integer>();
-			inversedl[i] = new LinkedList<Integer>();
+
+public class adjarray {
+	int[][] a;
+	int[][] inverseda;
+	int size;
+	public adjarray(ArrayList<String> g) {
+		a = new int[g.size()+1][g.size()+1];
+		inverseda = new int[g.size()+1][g.size()+1];
+		size = g.size();
+		for(int i=0;i<=g.size();i++) {
+			for(int j=0;j<=g.size();j++) {
+				a[i][j] = 0;
+				inverseda[i][j] = 0;
+			}
 		}
 		for(int i=0;i<g.size();i++) {
 			String[] line_arr = g.get(i).split(" ");
 			int number = Integer.parseInt(line_arr[0]);
 			for(int j=0;j<number;j++) {
-				l[i].add(Integer.parseInt(line_arr[j+1])-1);
-				inversedl[(Integer.parseInt(line_arr[j+1])-1)].add(i);
+				a[i+1][a[i+1][0]+1] = Integer.parseInt(line_arr[j+1]);
+				a[i+1][0]++;
+				inverseda[Integer.parseInt(line_arr[j+1])][inverseda[Integer.parseInt(line_arr[j+1])][0]+1] = i+1;
+				inverseda[Integer.parseInt(line_arr[j+1])][0]++;
 			}
 		}
 	}
 	public void getSCC() {
 		Stack<Integer> finished = new Stack<Integer>();
-		boolean[] visited = new boolean[this.l.length];
+		boolean[] visited = new boolean[this.size+1];
 		for(int i=0;i<visited.length;i++) {
 			visited[i] = false;
 		}
@@ -35,15 +41,15 @@ public class adjlist {
 		ArrayList<ArrayList<Integer>> scc = new ArrayList<ArrayList<Integer>>();
 		IDFS(scc, finished, visited);
 		
-		ArrayList<Integer>[] result = new ArrayList[this.l.length];
+		ArrayList<Integer>[] result = new ArrayList[this.size+1];
 		for(int i=0;i<scc.size();i++) {
 			Collections.sort(scc.get(i));
 			result[scc.get(i).get(0)] = scc.get(i);
 		}
-		for(int i=0;i<result.length;i++) {
+		for(int i=1;i<result.length;i++) {
 			if(result[i] != null) {
 				for(int j=0;j<result[i].size();j++) {
-					System.out.print(result[i].get(j)+1 + " ");
+					System.out.print(result[i].get(j) + " ");
 				}
 				System.out.println("");
 			}
@@ -54,22 +60,24 @@ public class adjlist {
 		now.push(init);
 		visited[init] = true;
 		while(!now.isEmpty()) {
-			int i=0;
-			for(i=0;i<this.l[now.peek()].size();i++) {
-				if(visited[this.l[now.peek()].get(i)] == false) {
+			int i;
+			boolean find = false;
+			for(i=1;i<=this.size;i++) {
+				if(this.a[now.peek()][i] != 0 && visited[this.a[now.peek()][i]] == false) {
+					find = true;
 					break;
 				}
 			}
-			if(i==this.l[now.peek()].size()) {
+			if(find == false) {
 				finished.push(now.pop());
 			}
 			else {
-				int temp = this.l[now.peek()].get(i);
+				int temp = this.a[now.peek()][i];
 				now.push(temp);
 				visited[temp] = true;
 			}
 		}
-		for(int i=0;i<visited.length;i++) {
+		for(int i=1;i<visited.length;i++) {
 			if(visited[i] == false) {
 				DFS(i, finished, visited);
 				return;
@@ -82,17 +90,19 @@ public class adjlist {
 		now.push(finished.peek());
 		visited[finished.peek()] = true;
 		while(!now.isEmpty()) {
-			int i=0;
-			for(i=0;i<this.inversedl[now.peek()].size();i++) {
-				if(visited[this.inversedl[now.peek()].get(i)] == false) {
+			int i;
+			boolean find = false;
+			for(i=1;i<=this.size;i++) {
+				if(this.inverseda[now.peek()][i] != 0 && visited[this.inverseda[now.peek()][i]] == false) {
+					find = true;
 					break;
 				}
 			}
-			if(i == this.inversedl[now.peek()].size()) {
+			if(find == false) {
 				result.add(now.pop());
 			}
 			else {
-				int temp = this.inversedl[now.peek()].get(i);
+				int temp = this.inverseda[now.peek()][i];
 				now.push(temp);
 				visited[temp] = true;
 			}
