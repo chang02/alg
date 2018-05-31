@@ -33,19 +33,24 @@ public class adjarray {
 		for(int i=0;i<visited.length;i++) {
 			visited[i] = false;
 		}
+		long start1 = System.currentTimeMillis();
 		DFS(0, finished, visited);
+		long end1 = System.currentTimeMillis();
 		for(int i=0;i<visited.length;i++) {
 			visited[i] = false;
 		}
 		
 		ArrayList<ArrayList<Integer>> scc = new ArrayList<ArrayList<Integer>>();
+		long start2 = System.currentTimeMillis();
 		IDFS(scc, finished, visited);
+		long end2 = System.currentTimeMillis();
 		
 		ArrayList<Integer>[] result = new ArrayList[this.size+1];
 		for(int i=0;i<scc.size();i++) {
 			Collections.sort(scc.get(i));
 			result[scc.get(i).get(0)] = scc.get(i);
 		}
+		System.out.println("adjacency array result");
 		for(int i=1;i<result.length;i++) {
 			if(result[i] != null) {
 				for(int j=0;j<result[i].size();j++) {
@@ -54,6 +59,7 @@ public class adjarray {
 				System.out.println("");
 			}
 		}
+		System.out.println("adjacency array executing time : " + (end1-start1)+(end2-start2));
 	}
 	public void DFS(int init, Stack<Integer> finished, boolean[] visited) {
 		Stack<Integer> now = new Stack<Integer>();
